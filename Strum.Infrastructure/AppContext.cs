@@ -9,10 +9,13 @@ public class AppContext:DbContext
 	public AppContext()
 	{
 	}
-	public DbSet<User> Users { get; set; }
+	public DbSet<User> Users { get; set; } = null!;
+	public DbSet<Messages> Messages { get; set; } = null!;
+	public DbSet<Vacancy> Vacancies { get; set; } = null!;
+	public DbSet<Notification> Notifications { get; set; } = null!;
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-		optionsBuilder.UseNpgsql("Host = localhost; Database = Strum; Username = postgres; Password = admin228");
+		optionsBuilder.UseNpgsql("jdbc:postgresql://localhost/Strum?password=admin228&user=postgres");
         base.OnConfiguring(optionsBuilder);
     }
 }
