@@ -15,8 +15,8 @@ public class AppContext:DbContext
 	public DbSet<Notification> Notifications { get; set; } = null!;
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-		optionsBuilder.UseNpgsql("jdbc:postgresql://localhost/Strum?password=admin228&user=postgres");
+		optionsBuilder.UseNpgsql("Host=localhost;Database=Strum;Username=postgres;Password=admin228");
         base.OnConfiguring(optionsBuilder);
     }
 }
-
+//jdbc:postgresql://localhost/Strum?password=admin228&user=postgres
