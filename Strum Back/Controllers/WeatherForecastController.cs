@@ -32,23 +32,11 @@ public class WeatherForecastController : ControllerBase
             })
             .ToArray();
     }
-
-    [HttpPost(Name = "GetUser")]
-
-    public User GetUser()
-    {
-        return new User
-        {
-            Id = 1,
-            FirstName = "John",
-            LastName = "Doe",
-            Email = ""
-        };
         // [HttpGet(Name = "test")]
         // public IEnumerable<String> Test()
         // {
         //     return Enumerable.Range(1, 5).Select(index => "test");
         // }
     }
-}
+
 

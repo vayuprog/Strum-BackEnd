@@ -7,6 +7,9 @@ namespace Strum.Infrastructure;
 
 public class DataContext : DbContext
 {
+	
+
+	
 	public DataContext()
 	{
 		
@@ -19,6 +22,7 @@ public class DataContext : DbContext
 	public DbSet<Messages> Messages { get; set; } 
 	public DbSet<Vacancy> Vacancies { get; set; } 
 	public DbSet<Notification> Notifications { get; set; } 
+	public DbSet<Musician> Musicians { get; set; }
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
