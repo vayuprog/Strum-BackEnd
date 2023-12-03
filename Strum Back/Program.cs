@@ -1,6 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Strum_Back.Mapper;
+using Strum.Core.Interfaces.Repositories;
 using Strum.Infrastructure;
+using Strum.Infrastructure.Repositories;
+using Strum.Logic.Commands;
 
+//dimon
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +14,9 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseNpgsql("Host=localhost;Database=Strum;Username=postgres;Password=admin228");
 });
+builder.Services.AddMediatR(cfg => {cfg.RegisterServicesFromAssembly(typeof(UserCreateRequest).Assembly);});
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddAutoMapper(typeof(MapperProfile));
 // Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

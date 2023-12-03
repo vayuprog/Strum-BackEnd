@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Strum.Core.Entities;
 using Strum.Infrastructure;
+using Strum.Logic.Commands;
 
 namespace Strum_Back.Controllers;
 
@@ -15,10 +17,13 @@ namespace Strum_Back.Controllers;
 public class UserController : ControllerBase
 {
     private readonly DataContext _context;
+    private readonly IMediator _mediator;
 
-    public UserController(DataContext context)
+    public UserController(DataContext context, IMediator mediator)
     {
         _context = context;
+        _mediator = mediator;
+        
     }
     
     [HttpGet("GetUser")]
@@ -34,19 +39,8 @@ public class UserController : ControllerBase
         return Ok(users);
     }
     [HttpPost("AddUser")]
-    public IActionResult AddUser([FromBody] User user)
+    public async Task AddUser([FromBody] UserCreateRequest request)
     {
-        try
-        {
-            _context.Users.Add(user);
-            _context.SaveChanges();
-            //return Ok(user);
-            return CreatedAtRoute("GetUserById", new { id = user.Id }, user);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        
+        await _mediator.Send(request);
     }
 }
