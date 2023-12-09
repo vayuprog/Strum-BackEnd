@@ -43,4 +43,16 @@ public class UserController : ControllerBase
     {
         await _mediator.Send(request);
     }
+    
+    [HttpPut("UpdateUser")]
+    public async Task UpdateUser([FromBody] UserUpdateRequest request)
+    {
+        await _mediator.Send(request);
+    }
+
+    [HttpDelete("DeleteUser")]
+    public async Task DeleteUser([FromBody] UserDeleteRequest request)
+    {
+        await _mediator.Send(request);
+    }
 }

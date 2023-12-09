@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Strum.Core.Entities;
 using Strum.Logic.Commands;
 
@@ -9,6 +10,8 @@ public class MapperProfile: Profile
     public MapperProfile()
     {
         CreateMap<UserCreateRequest, User>();
-        
+        CreateMap<UserUpdateRequest, User>();
+        CreateMap<UserDeleteRequest, User>();
+        //CreateMap<IdentityUserToken<>, User>();
     }
 }
