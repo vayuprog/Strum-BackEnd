@@ -13,5 +13,6 @@ public class MapperProfile: Profile
         CreateMap<UserUpdateRequest, User>();
         CreateMap<UserDeleteRequest, User>();
         //CreateMap<IdentityUserToken<>, User>();
+        CreateMap<UserLoginRequest, User>();
     }
 }

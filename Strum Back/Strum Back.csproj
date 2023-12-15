@@ -31,6 +31,7 @@
     <ProjectReference Include="..\Strum.Core\Strum.Core.csproj" />
     <ProjectReference Include="..\Strum.Infrastructure\Strum.Infrastructure.csproj" />
     <ProjectReference Include="..\Strum.Logic\Strum.Logic.csproj" />
+    <ProjectReference Include="..\Strum.Security\Strum.Security.csproj" />
   </ItemGroup>
 
 </Project>

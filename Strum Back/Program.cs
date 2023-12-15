@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Strum_Back.Mapper;
 using Strum.Core.Interfaces.Repositories;
 using Strum.Infrastructure;
 using Strum.Infrastructure.Repositories;
 using Strum.Logic.Commands;
-
-//dimon
+using Strum.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +17,8 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddMediatR(cfg => {cfg.RegisterServicesFromAssembly(typeof(UserCreateRequest).Assembly);});
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddAutoMapper(typeof(MapperProfile));
+builder.Services.AddScoped<PasswordHasher>();
+builder.Services.AddScoped<JwtTokenGenerator>();
 // Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

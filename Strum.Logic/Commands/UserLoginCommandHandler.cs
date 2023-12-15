@@ -5,32 +5,30 @@ using Strum.Core.Interfaces.Repositories;
 
 namespace Strum.Logic.Commands;
 
-public class UserCreateRequest : IRequest
+public class UserLoginRequest : IRequest
 {
-    public string FirstName { get; set; } 
-    public string LastName { get; set; } 
-    public string Email { get; set; } 
+    public string Email { get; set; }
     public string PasswordHash { get; set; }
-    public string Salt { get; set; }
 }
 
 
-public class UserCreateCommandHandler : IRequestHandler<UserCreateRequest>
+
+public class UserLoginCommandHandler : IRequestHandler<UserLoginRequest>
 {
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
     
-    public UserCreateCommandHandler(IUserRepository userRepository, IMapper mapper)
+    public UserLoginCommandHandler(IUserRepository userRepository, IMapper mapper)
     {
         _userRepository = userRepository;
         _mapper = mapper;
     }
     
-    public async Task Handle(UserCreateRequest request, CancellationToken cancellationToken)
+    public async Task Handle(UserLoginRequest request, CancellationToken cancellationToken)
     {
         var user = _mapper.Map<User>(request);
         await _userRepository.CreateAsync(user);
         await _userRepository.SaveAsync();
     }
     
-} 
+}
