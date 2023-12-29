@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -31,8 +33,9 @@ public class UserController : ControllerBase
         _passwordHasher = passwordHasher;
         _jwtTokenGenerator = jwtTokenGenerator;
     }
-    
+
     [HttpGet("GetUser")]
+    [EnableCors]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
         var users = await _context.Users.ToListAsync();
@@ -45,6 +48,7 @@ public class UserController : ControllerBase
         return Ok(users);
     }
     [HttpPost("AddUser")]
+    [EnableCors]
     public async Task AddUser([FromBody] UserCreateRequest request)
     {
         // Generate a random salt

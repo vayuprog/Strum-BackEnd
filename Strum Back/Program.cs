@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Strum_Back.Hubs;
 using Strum_Back.Mapper;
 using Strum.Core.Interfaces.Repositories;
 using Strum.Infrastructure;
@@ -14,9 +15,23 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseNpgsql("Host=localhost;Database=Strum;Username=postgres;Password=admin228");
 });
+
+// Configure CORS to allow requests from your front-end application's origin
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 builder.Services.AddMediatR(cfg => {cfg.RegisterServicesFromAssembly(typeof(UserCreateRequest).Assembly);});
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddAutoMapper(typeof(MapperProfile));
+builder.Services.AddSignalR();
 builder.Services.AddScoped<PasswordHasher>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 // Add services to the container.
@@ -35,6 +50,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
+
+app.UseCors("AllowSpecificOrigin");
+
+// app.UseEndpoints(endpoints =>
+// {
+//     endpoints.MapHub<ChatHub>("/chatHub");
+// });
 
 app.UseAuthorization();
 
