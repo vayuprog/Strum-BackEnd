@@ -19,7 +19,8 @@ public class UserService
             throw new Exception("User not found.");
         }
 
-        return user.ResetToken;
+        //return user.ResetToken;
+        return "";
     }
 
     public async Task<bool> UpdatePassword(string email, string newPassword)
@@ -45,7 +46,7 @@ public class UserService
             throw new Exception("User not found.");
         }
 
-        user.ResetToken = null;
+        //user.ResetToken = null;
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
     }

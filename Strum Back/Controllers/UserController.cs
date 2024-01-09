@@ -36,6 +36,7 @@ public class UserController : ControllerBase
 
     [HttpGet("GetUser")]
     [EnableCors]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
         var users = await _context.Users.ToListAsync();
@@ -67,14 +68,16 @@ public class UserController : ControllerBase
         
         await _mediator.Send(request);
     }
-    
+
     [HttpPut("UpdateUser")]
+    [Authorize]
     public async Task UpdateUser([FromBody] UserUpdateRequest request)
     {
         await _mediator.Send(request);
     }
 
     [HttpDelete("DeleteUser")]
+    [Authorize]
     public async Task DeleteUser([FromBody] UserDeleteRequest request)
     {
         await _mediator.Send(request);
@@ -105,5 +108,23 @@ public class UserController : ControllerBase
         var token = _jwtTokenGenerator.CreateToken(user.Email);
         
         return Ok(new { Token = token });
-    }  
+    }
+    
+    [HttpPost("Logout")]
+    [Authorize]
+    public IActionResult Logout()
+    {
+        try
+        {
+            CookieOptions cookieOptions = new CookieOptions();
+            cookieOptions.Expires = DateTime.Now.AddDays(-1);
+
+            Response.Cookies.Append("token", "", cookieOptions);    
+            return Ok(new { message = "You have been logged out successfully" });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, new { message = e.Message });
+        }
+    }
 }

@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Strum_Back.Hubs;
 using Strum_Back.Mapper;
 using Strum.Core.Interfaces.Repositories;
@@ -30,6 +33,32 @@ builder.Services.AddCors(options =>
         });
 });
 
+// builder.Services.AddAuthentication("YourAuthenticationScheme")
+//     .AddCookie("YourAuthenticationScheme", options =>
+//     {
+//         options.LoginPath = "/login";
+//         options.AccessDeniedPath = "/access-denied";
+//     });
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "", // Replace with your issuer
+        ValidAudience = "", // Replace with your audience
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("yourSecretKey")) // Replace with your secret key
+    };
+});                                               
+//
+
 builder.Services.AddMediatR(cfg => {cfg.RegisterServicesFromAssembly(typeof(UserCreateRequest).Assembly);});
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddAutoMapper(typeof(MapperProfile));
@@ -37,7 +66,7 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<PasswordHasher>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 builder.Services.AddScoped<UserService>();
-builder.Services.AddTransient<EmailService>(provider => new EmailService("smtp-relay.brevo.com", 587, "ivanyushchuk05@gmail.com", "Pf86J1tROpFKYIma"));
+builder.Services.AddTransient<EmailService>(provider => new EmailService("smtp.elasticemail.com", 2525, "ivanyushchuk05@gmail.com", "6FDA3DD798988EEC096028AF9C2076DAA917"));
 builder.Services.AddTransient<TwoFAService>();
 // Add services to the container.
 builder.Services.AddControllers();

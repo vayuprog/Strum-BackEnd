@@ -37,5 +37,6 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
         return encodedJwt;
+      
     }
 }
