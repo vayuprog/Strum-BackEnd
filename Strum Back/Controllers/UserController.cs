@@ -118,7 +118,7 @@ public class UserController : ControllerBase
         {
             CookieOptions cookieOptions = new CookieOptions();
             cookieOptions.Expires = DateTime.Now.AddDays(-1);
-
+        
             Response.Cookies.Append("token", "", cookieOptions);    
             return Ok(new { message = "You have been logged out successfully" });
         }
@@ -126,5 +126,6 @@ public class UserController : ControllerBase
         {
             return StatusCode(500, new { message = e.Message });
         }
+        
     }
 }

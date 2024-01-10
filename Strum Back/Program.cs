@@ -5,14 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Strum_Back;
-using Strum_Back.Hubs;
+using Strum.Logic.Hubs;
 using Strum_Back.Mapper;
 using Strum.Core.Interfaces.Repositories;
 using Strum.Infrastructure;
 using Strum.Infrastructure.Repositories;
 using Strum.Logic.Commands;
 using Strum.Security;
-using Strum_Back.Hubs;
 using Strum_Back.Services;
 
 var builder = WebApplication.CreateBuilder(args);

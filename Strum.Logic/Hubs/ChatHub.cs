@@ -1,10 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Strum_Back.Services;
 using Strum.Core.Entities;
 using Strum.Logic.Utils;
 
-namespace Strum_Back.Hubs
+namespace Strum.Logic.Hubs
 {
+   
     public class ChatHub : Hub
     {
         private readonly IDictionary<string, UserConnection> _userConnections;
@@ -15,6 +17,8 @@ namespace Strum_Back.Hubs
             _userConnections = userConnections;
             _userService = userService;
         }
+        
+        
 
         public async Task JoinRoom(string userName)
         {

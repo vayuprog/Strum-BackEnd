@@ -11,6 +11,5 @@ public class MessagesConfiguration: IEntityTypeConfiguration<Messages>
         builder.ToTable("Messages");
         builder.Property(x => x.FirstName).HasMaxLength(50);
         builder.Property(x => x.LastName).HasMaxLength(50);
-        
     }
 }
