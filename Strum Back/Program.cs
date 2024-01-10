@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Strum_Back;
 using Strum_Back.Hubs;
 using Strum_Back.Mapper;
 using Strum.Core.Interfaces.Repositories;
@@ -33,32 +35,6 @@ builder.Services.AddCors(options =>
         });
 });
 
-// builder.Services.AddAuthentication("YourAuthenticationScheme")
-//     .AddCookie("YourAuthenticationScheme", options =>
-//     {
-//         options.LoginPath = "/login";
-//         options.AccessDeniedPath = "/access-denied";
-//     });
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = "", // Replace with your issuer
-        ValidAudience = "", // Replace with your audience
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("yourSecretKey")) // Replace with your secret key
-    };
-});                                               
-//
-
 builder.Services.AddMediatR(cfg => {cfg.RegisterServicesFromAssembly(typeof(UserCreateRequest).Assembly);});
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddAutoMapper(typeof(MapperProfile));
@@ -72,7 +48,38 @@ builder.Services.AddTransient<TwoFAService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+
+    // Define the BearerAuth scheme
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
+builder.Services.AddJwt();
 
 
 var app = builder.Build();

@@ -87,7 +87,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
     {
         // Retrieve the user from the database
-        var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == request.Email);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
         
         if (user == null)
         {
