@@ -12,11 +12,12 @@ public class DataContext : DbContext
 	
 	public DataContext()
 	{
-		
-	}
+        Database.EnsureCreated();
+    }
 	public DataContext(DbContextOptions<DataContext> options) : base(options)
 	{
-	}
+        Database.EnsureCreated();
+    }
 	
 	public DbSet<User> Users { get; set; }
 	public DbSet<Messages> Messages { get; set; } 

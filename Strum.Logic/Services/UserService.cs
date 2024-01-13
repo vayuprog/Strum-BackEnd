@@ -37,7 +37,10 @@ public class UserService
 
         return result > 0;
     }
-
+    public async Task GetAllUsersByEmail(string email)
+    {
+        var user = _context.Users.First(u => u.Email == email);
+    }
     public async Task RemoveResetToken(string email)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);

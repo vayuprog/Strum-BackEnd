@@ -34,7 +34,7 @@ public class UserController : ControllerBase
         _jwtTokenGenerator = jwtTokenGenerator;
     }
 
-    [HttpGet("GetUser")]
+    [HttpGet("GetUsers")]
     [EnableCors]
     [Authorize]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
@@ -48,6 +48,30 @@ public class UserController : ControllerBase
 
         return Ok(users);
     }
+
+    [EnableCors]
+    [HttpPost("GetUser")] // Assuming you want to use a POST request for this operation
+    public async Task<ActionResult> GetUser([FromBody] int id)
+    {
+        try
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (user == null)
+            {
+                return NotFound("No user found");
+            }
+
+            return Ok(user);
+        }
+        catch (Exception ex)
+        {
+            // Log the exception for debugging purposes
+            // You might also want to return a more informative error message to the client
+            return StatusCode(500, $"Internal Server Error: {ex.Message}");
+        }
+    }
+
     [HttpPost("AddUser")]
     [EnableCors]
     public async Task AddUser([FromBody] UserCreateRequest request)
@@ -105,7 +129,7 @@ public class UserController : ControllerBase
         }
         
         // If the passwords match, generate a JWT token and return it
-        var token = _jwtTokenGenerator.CreateToken(user.Email);
+        var token = _jwtTokenGenerator.CreateToken(user);
         
         return Ok(new { Token = token });
     }
