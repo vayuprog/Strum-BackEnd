@@ -12,8 +12,8 @@ using Strum.Infrastructure;
 namespace Strum.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231201225654_Second")]
-    partial class Second
+    [Migration("20240113235643_posts16")]
+    partial class posts16
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Strum.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Strum.Core.Entities.Messages", b =>
+            modelBuilder.Entity("Strum.Core.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,24 +33,23 @@ namespace Strum.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("FirstName")
+                    b.Property<int>("PostId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Messages");
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Strum.Core.Entities.Musician", b =>
@@ -78,7 +77,7 @@ namespace Strum.Infrastructure.Migrations
                     b.ToTable("Musicians");
                 });
 
-            modelBuilder.Entity("Strum.Core.Entities.Notification", b =>
+            modelBuilder.Entity("Strum.Core.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -86,17 +85,31 @@ namespace Strum.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("FirstName")
+                    b.Property<DateTime>("DatePosted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Likes")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PostImage")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("LastName")
+                    b.Property<int>("Reposts")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notifications");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Post");
                 });
 
             modelBuilder.Entity("Strum.Core.Entities.User", b =>
@@ -122,9 +135,6 @@ namespace Strum.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<int?>("MessagesId")
-                        .HasColumnType("integer");
-
                     b.Property<int?>("MusicianId")
                         .HasColumnType("integer");
 
@@ -132,9 +142,11 @@ namespace Strum.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.Property<string>("Salt")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.HasIndex("MessagesId");
+                    b.HasKey("Id");
 
                     b.HasIndex("MusicianId");
 
@@ -162,25 +174,58 @@ namespace Strum.Infrastructure.Migrations
                     b.ToTable("Vacancies");
                 });
 
+            modelBuilder.Entity("Strum.Core.Entities.Comment", b =>
+                {
+                    b.HasOne("Strum.Core.Entities.Post", "Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Strum.Core.Entities.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Strum.Core.Entities.Post", b =>
+                {
+                    b.HasOne("Strum.Core.Entities.User", "User")
+                        .WithMany("Posts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Strum.Core.Entities.User", b =>
                 {
-                    b.HasOne("Strum.Core.Entities.Messages", null)
-                        .WithMany("Users")
-                        .HasForeignKey("MessagesId");
-
                     b.HasOne("Strum.Core.Entities.Musician", null)
                         .WithMany("Users")
                         .HasForeignKey("MusicianId");
                 });
 
-            modelBuilder.Entity("Strum.Core.Entities.Messages", b =>
+            modelBuilder.Entity("Strum.Core.Entities.Musician", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Strum.Core.Entities.Musician", b =>
+            modelBuilder.Entity("Strum.Core.Entities.Post", b =>
                 {
-                    b.Navigation("Users");
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Strum.Core.Entities.User", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,16 +12,17 @@ public class DataContext : DbContext
 	
 	public DataContext()
 	{
-		
-	}
+        Database.EnsureCreated();
+    }
 	public DataContext(DbContextOptions<DataContext> options) : base(options)
 	{
-	}
+        Database.EnsureCreated();
+    }
 	
 	public DbSet<User> Users { get; set; }
-	public DbSet<Messages> Messages { get; set; } 
+	//public DbSet<Messages> Messages { get; set; } 
 	public DbSet<Vacancy> Vacancies { get; set; } 
-	public DbSet<Notification> Notifications { get; set; } 
+	public DbSet<Comment> Comments { get; set; }
 	public DbSet<Musician> Musicians { get; set; }
 	public DbSet<Post> Post { get; set; }
 
@@ -33,7 +34,12 @@ public class DataContext : DbContext
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.Entity<Post>()
+               .HasOne(p => p.User)
+               .WithMany(u => u.Posts)
+               .HasForeignKey(p => p.UserId)
+               .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
 	}
 }
 //jdbc:postgresql://localhost/Strum?password=admin228&user=postgres
