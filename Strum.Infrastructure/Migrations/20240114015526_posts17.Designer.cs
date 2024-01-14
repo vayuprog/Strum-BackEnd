@@ -12,8 +12,8 @@ using Strum.Infrastructure;
 namespace Strum.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240113235643_posts16")]
-    partial class posts16
+    [Migration("20240114015526_posts17")]
+    partial class posts17
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,9 @@ namespace Strum.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("DatePosted")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("PostId")
                         .HasColumnType("integer");
 
@@ -43,38 +46,18 @@ namespace Strum.Infrastructure.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("VacancyId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PostId");
 
                     b.HasIndex("UserId");
 
+                    b.HasIndex("VacancyId");
+
                     b.ToTable("Comments");
-                });
-
-            modelBuilder.Entity("Strum.Core.Entities.Musician", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Expirience")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Ganre")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Instrument")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Musicians");
                 });
 
             modelBuilder.Entity("Strum.Core.Entities.Post", b =>
@@ -91,9 +74,8 @@ namespace Strum.Infrastructure.Migrations
                     b.Property<int>("Likes")
                         .HasColumnType("integer");
 
-                    b.Property<string>("PostImage")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<byte[]>("PostImage")
+                        .HasColumnType("bytea");
 
                     b.Property<int>("Reposts")
                         .HasColumnType("integer");
@@ -102,7 +84,7 @@ namespace Strum.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -120,23 +102,32 @@ namespace Strum.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Expirience")
+                        .HasColumnType("text");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<string>("Ganre")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Instrument")
+                        .HasColumnType("text");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
-
-                    b.Property<int?>("MusicianId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -146,9 +137,10 @@ namespace Strum.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.Property<int?>("UserRegion")
+                        .HasColumnType("integer");
 
-                    b.HasIndex("MusicianId");
+                    b.HasKey("Id");
 
                     b.ToTable("Users", (string)null);
                 });
@@ -161,15 +153,29 @@ namespace Strum.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("FirstName")
+                    b.Property<DateTime>("DatePosted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("LastName")
+                    b.Property<int>("Likes")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Region")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Vacancies");
                 });
@@ -188,9 +194,15 @@ namespace Strum.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Strum.Core.Entities.Vacancy", "Vacancy")
+                        .WithMany("Comments")
+                        .HasForeignKey("VacancyId");
+
                     b.Navigation("Post");
 
                     b.Navigation("User");
+
+                    b.Navigation("Vacancy");
                 });
 
             modelBuilder.Entity("Strum.Core.Entities.Post", b =>
@@ -198,22 +210,20 @@ namespace Strum.Infrastructure.Migrations
                     b.HasOne("Strum.Core.Entities.User", "User")
                         .WithMany("Posts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Strum.Core.Entities.User", b =>
+            modelBuilder.Entity("Strum.Core.Entities.Vacancy", b =>
                 {
-                    b.HasOne("Strum.Core.Entities.Musician", null)
-                        .WithMany("Users")
-                        .HasForeignKey("MusicianId");
-                });
+                    b.HasOne("Strum.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("Strum.Core.Entities.Musician", b =>
-                {
-                    b.Navigation("Users");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Strum.Core.Entities.Post", b =>
@@ -226,6 +236,11 @@ namespace Strum.Infrastructure.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Posts");
+                });
+
+            modelBuilder.Entity("Strum.Core.Entities.Vacancy", b =>
+                {
+                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }
