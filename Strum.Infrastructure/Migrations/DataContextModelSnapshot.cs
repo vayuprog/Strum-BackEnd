@@ -22,7 +22,7 @@ namespace Strum.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Strum.Core.Entities.Messages", b =>
+            modelBuilder.Entity("Strum.Core.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,24 +30,23 @@ namespace Strum.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("FirstName")
+                    b.Property<int>("PostId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Messages");
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Strum.Core.Entities.Musician", b =>
@@ -75,27 +74,6 @@ namespace Strum.Infrastructure.Migrations
                     b.ToTable("Musicians");
                 });
 
-            modelBuilder.Entity("Strum.Core.Entities.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Notifications");
-                });
-
             modelBuilder.Entity("Strum.Core.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
@@ -104,18 +82,15 @@ namespace Strum.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("DatePosted")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Likes")
                         .HasColumnType("integer");
 
-                    b.Property<byte[]>("PostImage")
-                        .HasColumnType("bytea");
+                    b.Property<string>("PostImage")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("Reposts")
                         .HasColumnType("integer");
@@ -124,7 +99,12 @@ namespace Strum.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Post");
                 });
@@ -156,10 +136,6 @@ namespace Strum.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ResetToken")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -195,6 +171,36 @@ namespace Strum.Infrastructure.Migrations
                     b.ToTable("Vacancies");
                 });
 
+            modelBuilder.Entity("Strum.Core.Entities.Comment", b =>
+                {
+                    b.HasOne("Strum.Core.Entities.Post", "Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Strum.Core.Entities.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Strum.Core.Entities.Post", b =>
+                {
+                    b.HasOne("Strum.Core.Entities.User", "User")
+                        .WithMany("Posts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Strum.Core.Entities.User", b =>
                 {
                     b.HasOne("Strum.Core.Entities.Musician", null)
@@ -205,6 +211,18 @@ namespace Strum.Infrastructure.Migrations
             modelBuilder.Entity("Strum.Core.Entities.Musician", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Strum.Core.Entities.Post", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Strum.Core.Entities.User", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }
