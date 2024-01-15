@@ -66,8 +66,7 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Log the exception for debugging purposes
-            // You might also want to return a more informative error message to the client
+          
             return StatusCode(500, $"Internal Server Error: {ex.Message}");
         }
     }

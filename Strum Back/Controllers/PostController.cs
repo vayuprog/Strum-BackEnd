@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RestSharp.Portable;
 using Strum.Core.Entities;
 using Strum.Infrastructure;
 using Strum_Back.Models;
@@ -34,18 +35,30 @@ public class PostController : ControllerBase
         return Ok(posts);
     }
 
+
     [HttpPost("AddPost")]
-    public async Task<ActionResult<Post>> AddPost([FromBody] PostRequestModel postRequest)
+    public async Task<ActionResult<Post>> AddPost([FromForm] PostRequestModel postRequest)
     {
         if (postRequest == null)
         {
             return BadRequest("Invalid post data");
         }
+
+        byte[] imageData = null;
+
+        if (postRequest.PostImage != null)
+        {
+            using (var binaryReader = new BinaryReader(postRequest.PostImage.OpenReadStream()))
+            {
+                imageData = binaryReader.ReadBytes((int)postRequest.PostImage.Length);
+            }
+        }
+
         var newPost = new Post
         {
             Text = postRequest.Text,
             UserId = postRequest.UserId,
-            PostImage = postRequest.PostImage,
+            PostImage = imageData,
             DatePosted = DateTime.UtcNow
         };
 
@@ -56,6 +69,7 @@ public class PostController : ControllerBase
         return CreatedAtAction(nameof(GetPosts), new { id = newPost.Id }, newPost);
     }
 
+
     [HttpPut("UpdatePost/{postId}")]
     public async Task<ActionResult<Post>> UpdatePost(int postId, [FromBody] PostEditModel updatedPost)
     {
@@ -65,10 +79,18 @@ public class PostController : ControllerBase
         {
             return NotFound("Post not found");
         }
+        byte[] imageData = null;
 
+        if (updatedPost.PostImage != null)
+        {
+            using (var binaryReader = new BinaryReader(updatedPost.PostImage.OpenReadStream()))
+            {
+                imageData = binaryReader.ReadBytes((int)updatedPost.PostImage.Length);
+            }
+        }
         // Update the properties you want to modify
         existingPost.Text = updatedPost.Text;
-        existingPost.PostImage = updatedPost.PostImage;
+        existingPost.PostImage = imageData;
 
         _context.Entry(existingPost).State = EntityState.Modified;
         await _context.SaveChangesAsync();

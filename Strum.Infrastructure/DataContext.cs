@@ -23,7 +23,6 @@ public class DataContext : DbContext
 	//public DbSet<Messages> Messages { get; set; } 
 	public DbSet<Vacancy> Vacancies { get; set; } 
 	public DbSet<Comment> Comments { get; set; }
-	public DbSet<Musician> Musicians { get; set; }
 	public DbSet<Post> Post { get; set; }
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
