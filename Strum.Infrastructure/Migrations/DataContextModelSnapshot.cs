@@ -33,7 +33,8 @@ namespace Strum.Infrastructure.Migrations
                     b.Property<DateTime>("DatePosted")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("PostId")
+                    b.Property<int?>("PostId")
+                        .IsRequired()
                         .HasColumnType("integer");
 
                     b.Property<string>("Title")

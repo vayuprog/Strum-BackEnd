@@ -1,10 +1,12 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestSharp.Portable;
 using Strum.Core.Entities;
 using Strum.Infrastructure;
 using Strum_Back.Models;
+using System.Security.Claims;
 
 namespace Strum_Back.Controllers;
 
@@ -37,6 +39,7 @@ public class PostController : ControllerBase
 
 
     [HttpPost("AddPost")]
+    [Authorize]
     public async Task<ActionResult<Post>> AddPost([FromForm] PostRequestModel postRequest)
     {
         if (postRequest == null)
@@ -53,12 +56,13 @@ public class PostController : ControllerBase
                 imageData = binaryReader.ReadBytes((int)postRequest.PostImage.Length);
             }
         }
-
+        var user = _context.Users.First(x => x.Id == postRequest.UserId);
         var newPost = new Post
         {
             Text = postRequest.Text,
             UserId = postRequest.UserId,
             PostImage = imageData,
+            User = user,
             DatePosted = DateTime.UtcNow
         };
 
@@ -71,26 +75,37 @@ public class PostController : ControllerBase
 
 
     [HttpPut("UpdatePost/{postId}")]
-    public async Task<ActionResult<Post>> UpdatePost(int postId, [FromBody] PostEditModel updatedPost)
+    [Authorize]
+    public async Task<ActionResult<Post>> UpdatePost(int postId, [FromForm] PostEditModel updatedPost)
     {
-        var existingPost = await _context.Post.FindAsync(postId);
+        var existingPost = await _context.Post
+            .Include(p => p.User) // Include the User in the query
+            .FirstOrDefaultAsync(p => p.Id == postId);
 
         if (existingPost == null)
         {
             return NotFound("Post not found");
         }
-        byte[] imageData = null;
+
+        // Get the current user ID from the claims
+        var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        // Check if the current user is the owner of the post
+        if (existingPost.User == null || existingPost.User.Email != currentUserId)
+        {
+            return Forbid("You do not have permission to edit this post");
+        }
 
         if (updatedPost.PostImage != null)
         {
             using (var binaryReader = new BinaryReader(updatedPost.PostImage.OpenReadStream()))
             {
-                imageData = binaryReader.ReadBytes((int)updatedPost.PostImage.Length);
+                existingPost.PostImage = binaryReader.ReadBytes((int)updatedPost.PostImage.Length);
             }
         }
-        // Update the properties you want to modify
+
+        // Update other properties
         existingPost.Text = updatedPost.Text;
-        existingPost.PostImage = imageData;
 
         _context.Entry(existingPost).State = EntityState.Modified;
         await _context.SaveChangesAsync();
@@ -98,14 +113,28 @@ public class PostController : ControllerBase
         return Ok(existingPost);
     }
 
+
     [HttpDelete("DeletePost/{postId}")]
+    [Authorize] // Ensure users are authenticated
     public async Task<ActionResult> DeletePost(int postId)
     {
-        var postToDelete = await _context.Post.FindAsync(postId);
+        // Get the current user ID from the claims
+        var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        // Find the post with the specified ID
+        var postToDelete = await _context.Post
+            .Include(p => p.User) // Include the User in the query
+            .FirstOrDefaultAsync(p => p.Id == postId);
 
         if (postToDelete == null)
         {
             return NotFound("Post not found");
+        }
+
+        // Check if the current user is the owner of the post
+        if (postToDelete.User == null || postToDelete.User.Email != currentUserId)
+        {
+            return Forbid("You do not have permission to delete this post");
         }
 
         _context.Post.Remove(postToDelete);
@@ -113,4 +142,5 @@ public class PostController : ControllerBase
 
         return NoContent();
     }
+
 }

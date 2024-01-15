@@ -12,8 +12,8 @@ using Strum.Infrastructure;
 namespace Strum.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240114015526_posts17")]
-    partial class posts17
+    [Migration("20240114125939_posts")]
+    partial class posts
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,7 +36,8 @@ namespace Strum.Infrastructure.Migrations
                     b.Property<DateTime>("DatePosted")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("PostId")
+                    b.Property<int?>("PostId")
+                        .IsRequired()
                         .HasColumnType("integer");
 
                     b.Property<string>("Title")
