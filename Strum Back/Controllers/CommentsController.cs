@@ -103,8 +103,6 @@ namespace Strum_Back.Controllers
         [HttpPost]
         public async Task<ActionResult<Comment>> PostComment(CommentRequestModel comment)
         {
-            var user = _context.Users.First(x => x.Id == comment.UserId);
-            var post = _context.Post.First(x => x.Id == comment.PostId);
             if (comment.PostId != null)
             {
                 // коментар для поста
@@ -114,8 +112,6 @@ namespace Strum_Back.Controllers
                     UserId = comment.UserId,
                     PostId = comment.PostId.Value,
                     DatePosted = DateTime.UtcNow,
-                    User = user,
-                    Post = post
                 };
 
                 _context.Comments.Add(newComment);

@@ -12,8 +12,8 @@ using Strum.Infrastructure;
 namespace Strum.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240114125939_posts")]
-    partial class posts
+    [Migration("20240115215710_posts1")]
+    partial class posts1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,9 +75,6 @@ namespace Strum.Infrastructure.Migrations
                     b.Property<int>("Likes")
                         .HasColumnType("integer");
 
-                    b.Property<byte[]>("PostImage")
-                        .HasColumnType("bytea");
-
                     b.Property<int>("Reposts")
                         .HasColumnType("integer");
 
@@ -85,7 +82,7 @@ namespace Strum.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -211,7 +208,8 @@ namespace Strum.Infrastructure.Migrations
                     b.HasOne("Strum.Core.Entities.User", "User")
                         .WithMany("Posts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

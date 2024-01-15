@@ -16,7 +16,6 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
 
         builder.ToTable("Posts");
         builder.Property(x => x.Text).HasMaxLength(2000);
-        builder.Property(x => x.PostImage).HasMaxLength(100000);
 
         builder.Property(x => x.DatePosted)
             .HasColumnName("DatePosted")

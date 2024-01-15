@@ -12,6 +12,7 @@ using Strum.Core.Entities;
 using Strum.Infrastructure;
 using Strum.Logic.Commands;
 using Strum.Security;
+using Strum_Back.Models;
 
 namespace Strum_Back.Controllers;
 
@@ -150,5 +151,50 @@ public class UserController : ControllerBase
             return StatusCode(500, new { message = e.Message });
         }
         
+    }
+
+
+    [HttpPut("UpdateUserDetails")]
+    public async Task<IActionResult> UpdateUserDetails([FromBody] UserUpdateDetailsRequest request)
+    {
+        try
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.UserId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Update optional fields if provided in the request
+            if (request.Ganre != null)
+            {
+                user.Ganre = request.Ganre;
+            }
+
+            if (request.Instrument != null)
+            {
+                user.Instrument = request.Instrument;
+            }
+
+            if (request.Expirience != null)
+            {
+                user.Expirience = request.Expirience;
+            }
+
+            if (request.Description != null)
+            {
+                user.Description = request.Description;
+            }
+
+            // Save changes to the database
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "User details updated successfully" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"Internal Server Error: {ex.Message}" });
+        }
     }
 }
