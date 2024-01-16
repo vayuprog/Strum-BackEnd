@@ -50,9 +50,8 @@ public class UserController : ControllerBase
         return Ok(users);
     }
 
-    [EnableCors]
-    [HttpPost("GetUser")] // Assuming you want to use a POST request for this operation
-    public async Task<ActionResult> GetUser([FromBody] int id)
+    [HttpPost("GetUser/{id}")]// Assuming you want to use a POST request for this operation
+    public async Task<ActionResult> GetUser( int id)
     {
         try
         {

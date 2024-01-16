@@ -117,6 +117,22 @@ public class PostController : ControllerBase
     }
 
 
+    [HttpGet("GetPostsByUser/{userId}")]
+    public async Task<ActionResult<IEnumerable<Post>>> GetPostsByUser(int userId)
+    {
+        var posts = await _context.Post
+            .Where(p => p.UserId == userId)
+            .ToListAsync();
+
+        if (posts == null || posts.Count == 0)
+        {
+            return NotFound("No posts found for the specified user");
+        }
+
+        return Ok(posts);
+    }
+
+
     [HttpDelete("DeletePost/{postId}")] // Ensure users are authenticated
     public async Task<ActionResult> DeletePost(int postId)
     {
