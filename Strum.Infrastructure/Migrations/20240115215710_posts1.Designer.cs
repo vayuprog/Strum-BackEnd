@@ -12,8 +12,8 @@ using Strum.Infrastructure;
 namespace Strum.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240114015526_posts17")]
-    partial class posts17
+    [Migration("20240115215710_posts1")]
+    partial class posts1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,7 +36,8 @@ namespace Strum.Infrastructure.Migrations
                     b.Property<DateTime>("DatePosted")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("PostId")
+                    b.Property<int?>("PostId")
+                        .IsRequired()
                         .HasColumnType("integer");
 
                     b.Property<string>("Title")
@@ -74,9 +75,6 @@ namespace Strum.Infrastructure.Migrations
                     b.Property<int>("Likes")
                         .HasColumnType("integer");
 
-                    b.Property<byte[]>("PostImage")
-                        .HasColumnType("bytea");
-
                     b.Property<int>("Reposts")
                         .HasColumnType("integer");
 
@@ -84,7 +82,7 @@ namespace Strum.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -210,7 +208,8 @@ namespace Strum.Infrastructure.Migrations
                     b.HasOne("Strum.Core.Entities.User", "User")
                         .WithMany("Posts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

@@ -33,6 +33,10 @@ public class DataContext : DbContext
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+        modelBuilder.Entity<Comment>()
+			.HasOne(c => c.Post)
+			.WithMany(p => p.Comments)
+			.HasForeignKey(c => c.PostId);
         modelBuilder.Entity<Post>()
                .HasOne(p => p.User)
                .WithMany(u => u.Posts)

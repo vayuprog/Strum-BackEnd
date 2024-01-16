@@ -13,6 +13,7 @@ using Strum.Infrastructure.Repositories;
 using Strum.Logic.Commands;
 using Strum.Security;
 using Strum_Back.Services;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,6 +78,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
 
 builder.Services.AddJwt();
 
